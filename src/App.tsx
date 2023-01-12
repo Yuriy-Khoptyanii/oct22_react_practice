@@ -9,6 +9,7 @@ import { FullProducts } from './types/allTypes';
 
 export const App: React.FC = () => {
   const [userSelect, setUserSelect] = useState('All');
+  const [nameSearch, setNameSearch] = useState('');
 
   const fullProducts: FullProducts[] = productsFromServer.map(product => {
     const findCategory = categoriesFromServer
@@ -68,21 +69,25 @@ export const App: React.FC = () => {
                   type="text"
                   className="input"
                   placeholder="Search"
-                  value="qwe"
+                  value={nameSearch}
+                  onChange={(event) => setNameSearch(event.target.value)}
                 />
 
                 <span className="icon is-left">
                   <i className="fas fa-search" aria-hidden="true" />
                 </span>
 
-                <span className="icon is-right">
-                  {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-                  <button
-                    data-cy="ClearButton"
-                    type="button"
-                    className="delete"
-                  />
-                </span>
+                {nameSearch && (
+                  <span className="icon is-right">
+                    {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+                    <button
+                      data-cy="ClearButton"
+                      type="button"
+                      className="delete"
+                      onClick={() => setNameSearch('')}
+                    />
+                  </span>
+                )}
               </p>
             </div>
 
@@ -205,10 +210,14 @@ export const App: React.FC = () => {
               {
                 fullProducts.filter(item => {
                   if (userSelect === 'All') {
-                    return true;
+                    return item.name
+                      .toLowerCase()
+                      .includes(nameSearch.toLowerCase());
                   }
 
-                  return item.owner?.name === userSelect;
+                  return item.owner?.name === userSelect && item.name
+                    .toLowerCase()
+                    .includes(nameSearch.toLowerCase());
                 }).map(product => (
                   <tr key={product.id} data-cy="Product">
                     <td className="has-text-weight-bold" data-cy="ProductId">
